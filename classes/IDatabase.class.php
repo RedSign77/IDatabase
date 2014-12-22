@@ -20,6 +20,9 @@ class IDatabase
     private $strQueryString;
     private static $objDb;
 
+    /**
+     * construct
+     */
     public function __construct()
     {
         try {
@@ -34,6 +37,11 @@ class IDatabase
         }
     }
 
+    /**
+     * Get singleton pattern
+     *
+     * @return IDatabase
+     */
     public static function getSingleton()
     {
         if (!isset(self::$objDb)) {
@@ -42,21 +50,43 @@ class IDatabase
         return self::$objDb;
     }
 
+    /**
+     * Get mysqli info
+     *
+     * @return string
+     */
     public function info()
     {
         return $this->mysqli->stat();
     }
 
+    /**
+     * Close connection
+     *
+     * @return bool
+     */
     public function close()
     {
         return $this->mysqli->close();
     }
 
+    /**
+     * Get last query string
+     *
+     * @return mixed
+     */
     public function getLastQuery()
     {
         return $this->strQueryString;
     }
 
+    /**
+     * Run mysql select query
+     *
+     * @param $strQuery
+     * @return array
+     * @throws EException
+     */
     public function select($strQuery)
     {
         $ret = array();
@@ -76,11 +106,25 @@ class IDatabase
         return $ret;
     }
 
-    private function valid($querystring)
+    /**
+     * Check mysql select string
+     *
+     * @param $query
+     * @return string
+     */
+    private function valid($query)
     {
-        return $this->mysqli->real_escape_string($querystring);
+        return $this->mysqli->real_escape_string($query);
     }
 
+    /**
+     * Execute a query
+     *
+     * @param $strQuery
+     * @param bool $validate
+     * @param int $use
+     * @return bool|mysqli_result
+     */
     public function executeQuery($strQuery, $validate = false, $use = MYSQLI_USE_RESULT)
     {
         if ($validate)
@@ -88,6 +132,12 @@ class IDatabase
         return $this->mysqli->query($strQuery, $use);
     }
 
+    /**
+     * Run a delete query
+     *
+     * @param $strQuery
+     * @return int
+     */
     public function delete($strQuery)
     {
         $ret = 0;
@@ -96,6 +146,12 @@ class IDatabase
         return $ret;
     }
 
+    /**
+     * Run an insert query
+     *
+     * @param $strQuery
+     * @return int|mixed
+     */
     public function insert($strQuery)
     {
         $ret = 0;
@@ -104,11 +160,25 @@ class IDatabase
         return $ret;
     }
 
+    /**
+     * Run an update query
+     *
+     * @param $strQuery
+     * @return int
+     */
     public function update($strQuery)
     {
         return $this->delete($strQuery);
     }
 
+    /**
+     * Get a row number from a table with a condition
+     *
+     * @param $strTable
+     * @param string $strWhere
+     * @return int|mixed
+     * @throws EException
+     */
     public function getRowNumber($strTable, $strWhere = "")
     {
         $ret = 0;
@@ -120,6 +190,15 @@ class IDatabase
         return $ret;
     }
 
+    /**
+     * Get a single field value from a query
+     *
+     * @param $strTable
+     * @param $strField
+     * @param string $strWhere
+     * @return mixed
+     * @throws EException
+     */
     public function getSingleData($strTable, $strField, $strWhere = "")
     {
         $this->strQueryString = "SELECT " . $strField . " FROM " . $strTable . ($strWhere != "" ? " WHERE " . $strWhere : null);
@@ -128,6 +207,16 @@ class IDatabase
         return ($arrRet[$strField]);
     }
 
+    /**
+     * Get a single row
+     *
+     * @param $strTable
+     * @param string $strWhere
+     * @param string $strOrderBy
+     * @param array $fields
+     * @return mixed
+     * @throws EException
+     */
     public function getOneRow($strTable, $strWhere = "", $strOrderBy = "", $fields = array())
     {
         $this->strQueryString = "SELECT " . (count($fields) > 0 ? join(",", $fields) : "*") . " FROM " . $strTable . ($strWhere != "" ? " WHERE " . $strWhere : null) . ($strOrderBy != "" ? " ORDER BY " . $strOrderBy : null . " LIMIT 1");
@@ -136,20 +225,20 @@ class IDatabase
     }
 
     /**
-     * @name insertA
-     * @param array $arrData
      * Insert an array on the table key
+     *
+     * @param array $arrData
+     * @return int affected row id
+     * @throws EException
      */
     public function insertA($arrData)
     {
         $intRet = 0;
         if (!isset($arrData['table'])) {
             throw new EException("No table found on " . __METHOD__, 1002);
-            return $intRet;
         }
         if (count($arrData) < 2) {
-            throw new EException("No datafields found on " . __METHOD__, 1003);
-            return $intRet;
+            throw new EException("No data fields found on " . __METHOD__, 1003);
         }
         $strQuery = "INSERT INTO " . $arrData['table'];
         unset($arrData['table']);
@@ -160,20 +249,20 @@ class IDatabase
     }
 
     /**
-     * @name updateA
-     * @param array $arrData
      * Update row on the pairs of key(s) and value(s) with where key!
+     *
+     * @param array $arrData
+     * @return int affected row numbers
+     * @throws EException
      */
     public function updateA($arrData)
     {
         $intRet = 0;
         if (!isset($arrData['table'])) {
             throw new EException("NO TABLE: " . __METHOD__ . ", " . __LINE__);
-            return $intRet;
         }
         if (count($arrData) < 2) {
             throw new EException("NO DATAFIELDS: " . __METHOD__ . ", " . __LINE__);
-            return $intRet;
         }
         $this->adminLog($arrData);
         $strWhere = " WHERE " . $arrData['where'];
@@ -193,6 +282,13 @@ class IDatabase
         return $intRet;
     }
 
+    /**
+     * Check table is exists
+     *
+     * @param $table
+     * @return bool
+     * @throws EException
+     */
     public function tableExists($table)
     {
         $ret = $this->select("SHOW TABLES LIKE '" . $table . "'");
@@ -202,6 +298,13 @@ class IDatabase
             return false;
     }
 
+    /**
+     * Log to a selected admin table
+     *
+     * @param $data
+     * @return int
+     * @throws EException
+     */
     public function adminLog($data)
     {
         $inserted = array(
@@ -213,6 +316,13 @@ class IDatabase
         return $ret;
     }
 
+    /**
+     * Call a mysqli procedure
+     *
+     * @param $function
+     * @return array
+     * @throws EException
+     */
     public function call($function)
     {
         return $this->select($function);
