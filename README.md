@@ -44,3 +44,15 @@ $wunderground->setCity('Sydney','AU');
 // Actions: forecast, alerts, almanac, astronomy, conditions, currenthurricane, forecast10day, geolookup, hourly, hourly10day, rawtide, satellite, tide, webcams, yesterday
 $ret = $wunderground->getData('forecast'); 
 
+
+FormDataValidator
+-----------------
+
+require_once 'classes/FormDataValidator.class.php'; 
+
+$accepted = array('name', 'nick', 'email', 'message'); 
+$required = array('name', 'nick', 'message'); 
+
+$validator = new FormDataValidator($_POST, $accepted, $required); 
+$resp = $validator->validate(); 
+var_export($resp); 
