@@ -1,7 +1,10 @@
+<h3>MyClasses is a package folder with my usable or developed classes. Please use carefull!</h3>
+
+<b>IDatabase.class</b>
+
 This class is a MySQL Database access wrapper using MySQLi.
 
 It can:
-
 - Connect to a MySQL server
 - Get MySQL server statistics
 - Execute a SELECT SQL query and return all the results into an array
