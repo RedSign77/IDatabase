@@ -56,3 +56,56 @@ $required = array('name', 'nick', 'message');
 $validator = new FormDataValidator($_POST, $accepted, $required); 
 $resp = $validator->validate(); 
 var_export($resp); 
+
+Basket
+------
+
+include_once 'Basket.class.php'; 
+
+  function summarylist() { 
+    $items = Basket::getItemList(); 
+    var_export($items); 
+    print "<br>Full price: " . Basket::getFullPrice(); 
+    print "<br>Item quantity: " . Basket::getItemCount(); 
+    print "<br>Item types: " . Basket::getItemtypeCount(); 
+    print "<br>Last modify: " . Basket::getLastModify(false). " (".Basket::getLastModify().")"; 
+    $sleep = mt_rand(1,3); 
+    print "<br> >> Wait ".$sleep." seconds for testing.<br>"; 
+    //sleep($sleep); 
+  } 
+
+  Basket::emptyBasket(); 
+  print "Simple Static Basket with session storage<br>"; 
+  print "<br>Basket (empty) [emptyBasket, getItemList]<br>"; 
+  summarylist(); 
+
+  print "<br><br>Add a simple item [changeItem]<br>"; 
+  Basket::changeItem('sugar_01', 12.25, 'Sugar, 1kg', 0.75); 
+  summarylist(); 
+
+  print "<br><br>Add multiple items [addItemFromArray]<br>"; 
+  $add_items = array( 
+    array('id' => 'salt_01', 'quantity' => 4.57, 'name' => 'Salt, 1kg', 'price' => 0.65), 
+    array('id' => 'salt_02', 'quantity' => 3.10, 'name' => 'Salt, 2kg', 'price' => 1.15), 
+    array('id' => 'salt_03', 'quantity' => 2.90, 'name' => 'Salt, 5kg', 'price' => 2.55), 
+    array('id' => 'sugar_02', 'quantity' => 1.34, 'name' => 'Sugar, 2kg', 'price' => 1.40), 
+    array('id' => 'sugar_03', 'quantity' => 13.45, 'name' => 'Sugar, 5kg', 'price' => 3.59), 
+  ); 
+  Basket::addItemFromArray($add_items); 
+  summarylist(); 
+
+  print "<br><br>Remove salt_03 [removeItem]<br>"; 
+  Basket::removeItem('salt_03'); 
+  summarylist(); 
+
+  print "<br><br>Change the quantity of salt_02 to 3.45 [changeItem]<br>"; 
+  Basket::changeItem('salt_02', 3.45, null, 0); 
+  summarylist(); 
+
+  print "<br><br>Change the price of salt_02 to 1.23 [changeItem]<br>"; 
+  Basket::changeItem('salt_02', 0, null, 1.23); 
+  summarylist(); 
+
+  print "<br><br>Change the name of salt_02 to Sugar, 1.5kg [changeItem]<br>"; 
+  Basket::changeItem('salt_02', 0, 'Sugar, 1.5kg', 0); 
+  summarylist(); 
