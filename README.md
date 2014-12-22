@@ -1,4 +1,6 @@
-This class is a MySQL Database access wrapper using MySQLi. It can:
+This class is a MySQL Database access wrapper using MySQLi.
+
+It can:
 
 - Connect to a MySQL server
 - Get MySQL server statistics
