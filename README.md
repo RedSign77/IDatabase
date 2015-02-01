@@ -1,4 +1,6 @@
-#MyClasses is a package folder with my usable or developed classes. Please use carefull!
+#MyClasses is a package folder with my usable or developed classes.
+
+###Please use carefull!
 
 ##IDatabase
 
