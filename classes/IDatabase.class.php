@@ -23,7 +23,7 @@ class IDatabase
     /**
      * construct
      */
-    public function __construct()
+    private function __construct()
     {
         try {
             @$this->mysqli = new mysqli($this->host, $this->user, $this->pass, $this->db);
